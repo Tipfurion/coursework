@@ -1,21 +1,25 @@
 <template>
 <div>
-    <div class="wrapper">
+    <div class="label-wrapper">
         <h2>{{activeTableItem}}</h2>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <td class="tHeader" @click="changeSortItem" v-for="(header, i) in tHeaders" :id=i :key=i>{{header}}<sort-icon :id=i></sort-icon>
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, i) in tItems" :index=i :key=i>
-          <td v-for="(item, j) in tItems[i]" :index=j :key=j>{{item}}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="wrapper">
+      <table>
+        <thead>
+          <tr>
+            <td class="tHeader" @click="changeSortItem" v-for="(header, i) in tHeaders" :id=i :key=i>{{header}}<sort-icon :id=i></sort-icon>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, i) in tItems" :index=i :key=i>
+            <td v-for="(item, j) in tItems[i]" :index=j :key=j>{{item}}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+    </div>
+
 </div>
 </template>
 
@@ -105,10 +109,19 @@ $bd-item-border-color: #000000
 
 .wrapper
   display: flex
-  justify-content: center
-table
+  padding: 10px
   
+.label-wrapper
+  display: flex
+  justify-content: center
+  
+.menu
+  width: 10%
+  height: 600px
+  background-color: #000000   
+table
   border-collapse: collapse
+  width: 90%
 .tHeader
   font-size: 1.3em
   font-weight: bold
