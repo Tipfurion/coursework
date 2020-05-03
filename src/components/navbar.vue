@@ -5,7 +5,6 @@
         <div class="nav-el dropdown-wrapper" @click="dropdownActive=!dropdownActive " :class="{'dropdown-active': dropdownActive}">{{activeFilterItem}}
           <div class="dropdown " v-if="dropdownActive" v-click-outside="close">
             <div class="nav-el dropdown-item"  v-for="(dbFilterItem, i) in dbFilterItems" :index=i :key=i @click="activeFilterItem=dbFilterItem" ><span>{{dbFilterItem}}</span></div>
-
           </div>
 
         </div>
@@ -14,8 +13,10 @@
         </div>
 
       </div>    
-      <div class="bd-wrapper">
-        <div class="nav-el bd-item"  v-for="(dbItem, i) in dbItems" :index=i :key=i @click="activeTableItem=dbItem"><span>{{dbItem}}</span></div>
+      <div class="nav-el dropdown-wrapper" @click="dropdown2Active=!dropdown2Active " :class="{'dropdown-active': dropdown2Active}">{{activeTableItem}}
+         <div class="dropdown " v-if="dropdown2Active" v-click-outside="close">
+        <div class="nav-el dropdown-item"  v-for="(dbItem, i) in dbItems" :index=i :key=i @click="activeTableItem=dbItem"><span>{{dbItem}}</span></div>
+        </div>
       </div>
   </nav>
 </template>
@@ -32,8 +33,9 @@ export default {
       dbItems:[],
       dbFilterItems:[],
       dropdownActive:false,
+      dropdown2Active:false,
       activeFilterItem: '______________________',
-      activeTableItem:String
+      activeTableItem:'Выбор таблицы'
     }
   },   
    methods:{
@@ -61,10 +63,7 @@ export default {
 </script>
 <style lang="sass" scoped>
 
-$back-color: #A2A2A3
-$nav-height: 50px
-$bd-item-border-color: #000000
-$bd-item-hover-color: #C4C4C4
+@import "vars.sass"
 nav
   width: 100%
   height: $nav-height
@@ -72,6 +71,7 @@ nav
   align-items: center
   justify-content: space-between
   background-color:$back-color
+  position: fixed
 .bd-wrapper
   height: $nav-height 
   display: flex
@@ -99,6 +99,7 @@ nav
 
 .dropdown
   position: absolute
+  z-index: 111
   flex-direction: column
   top: 50px
   width: 160px
@@ -113,27 +114,13 @@ nav
   margin-top: auto
   padding: 10px
   width: 160px
+  z-index: 111
 .dropdown-item:hover
   background-color: $back-color
 
 
 
-input[type="text"]
-  appearance: none
-  background-color: $bd-item-hover-color
-  border: 2px solid transparent
-  line-height: 0
-  font-size: 17px
-  width: 100%
-  display: block
-  box-sizing: border-box
-  padding: 10px 15px
-  border-radius: 10px
-  box-shadow: none
-  outline: none !important
-  letter-spacing: 0.01em
-  position: relative
-  z-index: 1
+
       
 
 </style>

@@ -1,0 +1,3 @@
+      <div class="bd-wrapper">
+        <div class="nav-el bd-item"  v-for="(dbItem, i) in dbItems" :index=i :key=i @click="activeTableItem=dbItem"><span>{{dbItem}}</span></div>
+      </div>

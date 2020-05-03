@@ -12,18 +12,32 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, i) in tItems" :index=i :key=i>
+          <tr v-for="(item, i) in tItems" :id=i :key=i>
             <td v-for="(item, j) in tItems[i]" :index=j :key=j>{{item}}</td>
+            <td class="tIcon" ><img src="../assets/edit.svg"></td>
+            <td class="tIcon" @click="deleteData(i)"><img src="../assets/delete.svg"></td>
+
           </tr>
-        </tbody>
+        </tbody>        
       </table>
+      <div class="label-wrapper">
+        <h2>Добавить</h2>
+      </div>
+      <form @submit.prevent="submit">
+      <div class="inputs-wrapper" >
+        <input  v-for="(item, i) in dbFilterItems" :index=i :key=i type="text" id='search' :class="{ submited: submited }" @submit.prevent="submit"   :placeholder=item  >
       
+        <button class="submit-button" type="submit">Добавить</button>
+      </div>
+      </form>
     </div>
+    
 
 </div>
 </template>
 
 <script>
+import reqApi from '../sendReq.js'
 import sortIcon from'./sortIcon.vue'
 export default {
   name: 'tableContent',
@@ -32,11 +46,14 @@ export default {
   },
   data:function(){
     return{
+      submited:false,
       arrowActive:false,
       tHeaders:['ID Поставщика','Телефон','Адрес','Адрес','Адрес','Адрес'],
       tItems:[['а',1,3,5,6,'a'],['в',1,1,1,1,'c'],['б',2,2,3,4,'b']],
       tItemsStart: [],
       activeTableItem:"Выберите таблицу",
+      dbFilterItems:[],
+      inputValues:[],
       activeFilterItem:String,
       activeSortItemIndex:Number,
       clickCounter:0,
@@ -97,6 +114,71 @@ export default {
         }
       }      
      },
+     submit:async function(e){ 
+       this.submited=true
+       setTimeout(()=>{
+         this.submited=false;
+       },300)
+
+      for(let i=0;i<this.inputValues.length;i++){
+        this.inputValues[i] = e.target[i].value
+      }  
+      let data={}
+      for(let i=0;i<this.tHeaders.length;i++){
+        let prop = this.tHeaders[i]
+        data[prop]= this.inputValues[i]
+      }
+      try{
+        let res = await reqApi.sendReq('api/addData',{
+          method:"POST",
+          headers: {
+              'Content-Type': 'application/json;charset=utf-8'
+            },
+          body:JSON.stringify({table:this.activeTableItem,data})
+        },true)
+        if(res.status===200){
+          this.tItems.push([...this.inputValues])
+          for(let i=0;i<this.inputValues.length;i++){    
+            e.target[i].value= ''
+          }            
+        }
+        else{
+          let response = await res.response
+          console.error(response.sqlMessage)
+          alert(response.sqlMessage)
+        }
+       
+      }
+      catch(err){
+        console.error(err)
+      }
+      
+     },
+     deleteData:async function(id){     
+      try{
+        let res = await reqApi.sendReq('api/deleteData',{
+          method:"DELETE",
+          headers: {
+              'Content-Type': 'application/json;charset=utf-8'
+            },
+          body:JSON.stringify({table:this.activeTableItem,headers:this.tHeaders, items:this.tItems[id]})
+        },true)      
+        if(res.status===200){
+          this.tItems.splice(id,1)
+        }
+        else{
+          let response = await res.response 
+          console.error(response.sqlMessage)
+          alert(response.sqlMessage)
+        }
+      }
+      catch(err){
+        console.error(err)
+        alert(err)
+      }
+       
+       
+     }
     },
     watch:{
 
@@ -105,20 +187,20 @@ export default {
 }
 </script>
 <style lang="sass" scoped>
-$bd-item-border-color: #000000
-
+@import "vars.sass"
 .wrapper
   display: flex
+  flex-direction: column
   padding: 10px
-  
+  justify-content: center
 .label-wrapper
   display: flex
   justify-content: center
-  
+  width: 40%
 .menu
   width: 10%
   height: 600px
-  background-color: #000000   
+  background-color: $bd-item-border-color
 table
   border-collapse: collapse
   width: 90%
@@ -132,7 +214,7 @@ tr:nth-child(even)
   background-color: #f2f2f2
 tbody
   tr
-    border-bottom: 1px solid $bd-item-border-color
+    
   td
     border: 1px solid $bd-item-border-color
     align-content: center
@@ -141,6 +223,35 @@ thead
   tr
     border-bottom: 2px solid $bd-item-border-color
   td
-   
-
+hr
+  margin-top: 10px
+.submit-button
+  margin-top:10px
+  border: none
+  border-radius: 5px
+  box-shadow: none
+  outline: none !important  
+  height: 40px
+  width: 60%
+  background-color: $bd-item-hover-color
+.submit-button:hover
+  background-color:$back-color
+  transform: scale(1.1)
+input[type="text"]
+  margin: 10px
+.inputs-wrapper
+  width: 40%
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+.submited
+  background-color:$back-color
+  transform: scale(1.1)
+.tIcon
+  border: none
+  background-color: white 
+  border-collapse: none
+.tIcon:hover
+   background-color: $back-color
 </style>
