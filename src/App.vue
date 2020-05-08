@@ -31,13 +31,15 @@ export default {
       let res = await reqApi.sendReq('api/getTable/'+item)
 
       //смена данных в таблице      
+
       this.$refs.tableContent.tHeaders = Object.keys(res[0])
       this.$refs.tableContent.inputValues.length = 0
       this.$refs.tableContent.inputValues.length = Object.keys(res[0]).length
       this.$refs.tableContent.tItems.length=0
-      for(let i=0;i<res.length;i++)
-      {
-          this.$refs.tableContent.tItems.push(Object.values(res[i])) 
+      this.$refs.tableContent.isEdit.length = res.length;
+      for(let i=0;i<res.length;i++){
+        this.$refs.tableContent.isEdit[i] = false;
+        this.$refs.tableContent.tItems.push(Object.values(res[i])) 
       }
       this.$refs.tableContent.tItemsStart = [...this.$refs.tableContent.tItems]
       
@@ -96,7 +98,8 @@ input[type="text"]
   background-color: $bd-item-hover-color
   border: 2px solid transparent
   line-height: 0
-  font-size: 17px
+  font-family: roboto
+  font-size: 16px
   width: 100%
   display: block
   box-sizing: border-box

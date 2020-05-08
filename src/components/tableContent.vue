@@ -1,6 +1,32 @@
 <template>
 <div>
-    <div class="label-wrapper">
+    <div v-if="isPrint" class="modal">
+    <div class="label-wrapper-modal">
+        <h2>{{activeTableItem}}</h2>
+    </div>         
+      <table>
+        <thead>
+          <tr>
+            <td class="tHeader" v-for="(header, i) in tHeaders" :id=i :key=i>{{header}}<sort-icon :id=i></sort-icon>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, i) in tItems" :id="'tr'+i" :key=i  >
+            <td  v-for="(item, j) in tItems[i]" :index=j :key=j>
+              <span>{{item}}</span>
+            </td>
+          </tr>
+        </tbody>        
+      </table>
+    <div class="label-wrapper-modal">
+        <button class="submit-button" @click="print">Назад</button>
+    </div>      
+    </div>
+
+
+
+    <div class="label-wrapper-main">
         <h2>{{activeTableItem}}</h2>
     </div>
     <div class="wrapper">
@@ -12,24 +38,35 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, i) in tItems" :id=i :key=i>
-            <td v-for="(item, j) in tItems[i]" :index=j :key=j>{{item}}</td>
-            <td class="tIcon" ><img src="../assets/edit.svg"></td>
+          <tr v-for="(item, i) in tItems" :id="'tr'+i" :key=i  >
+            <td  v-for="(item, j) in tItems[i]" :index=j :key=j>
+              <span v-if="!isEdit[i]">{{item}}</span>
+              <span v-else><input type="text" class="tInput" :value="item" :id="'inp'+j"></span>
+            </td>
+            <td v-if="isEdit[i]" class="tIcon" @click="submitEdit(i)"><img src="../assets/done.svg"></td>
+            <td class="tIcon" @click="edit(i)"><img src="../assets/edit.svg"></td>
             <td class="tIcon" @click="deleteData(i)"><img src="../assets/delete.svg"></td>
-
           </tr>
         </tbody>        
       </table>
       <div class="label-wrapper">
         <h2>Добавить</h2>
       </div>
-      <form @submit.prevent="submit">
-      <div class="inputs-wrapper" >
-        <input  v-for="(item, i) in dbFilterItems" :index=i :key=i type="text" id='search' :class="{ submited: submited }" @submit.prevent="submit"   :placeholder=item  >
-      
-        <button class="submit-button" type="submit">Добавить</button>
+      <div class="form-wrapper">
+        <form @submit.prevent="submit">
+        <div class="inputs-wrapper" >
+          <input  v-for="(item, i) in dbFilterItems" :index=i :key=i type="text" id='search' :class="{ submited: submited }" @submit.prevent="submit"   :placeholder=item  >
+        
+          <button class="submit-button" type="submit">Добавить</button>
+        </div>
+        </form>
+        
+        <div class="down-menu">
+          <div>
+              <button class="submit-button" @click="print">Печать<img class="btnIcon" src="../assets/print.svg"></button>
+            </div>
+        </div>
       </div>
-      </form>
     </div>
     
 
@@ -50,13 +87,16 @@ export default {
       arrowActive:false,
       tHeaders:['ID Поставщика','Телефон','Адрес','Адрес','Адрес','Адрес'],
       tItems:[['а',1,3,5,6,'a'],['в',1,1,1,1,'c'],['б',2,2,3,4,'b']],
+      isEdit:[],
       tItemsStart: [],
       activeTableItem:"Выберите таблицу",
       dbFilterItems:[],
       inputValues:[],
+      clickCounter:0,
+      isPrint:false,
+      prevEditIndex:Number,
       activeFilterItem:String,
       activeSortItemIndex:Number,
-      clickCounter:0,
       prevSortItemIndex:Number
     }
   },   
@@ -87,7 +127,6 @@ export default {
       if(typeof(this.tItems[0][this.activeSortItemIndex]==='string')){
         this.tItems.reverse()
       }
-      console.log(this.$children);
       for(let i=0;i<this.$children.length;i++){
         if(this.$children[i].id === this.activeSortItemIndex){
           this.$children[i].clickCounter = this.clickCounter
@@ -178,11 +217,51 @@ export default {
       }
        
        
-     }
-    },
-    watch:{
+     },
+     edit:function(id){
+       if(this.prevEditIndex!==id){
+         this.isEdit[this.prevEditIndex]=false;
 
-    }
+       }
+       this.isEdit[id]=!this.isEdit[id]
+       this.prevEditIndex = id;
+       //dirty trick
+       this.tItems.push(['kostyl'])
+       this.tItems.pop()
+     },
+     submitEdit:async function(id){
+       let values = []
+       for(let i=0;i<this.tHeaders.length;i++){
+         let el = document.getElementById('inp'+i)
+         values.push(el.value)
+       }
+        let res = await reqApi.sendReq("/api/editData", {
+          method:"PUT",
+          headers: {
+              'Content-Type': 'application/json;charset=utf-8'
+            },
+          body:JSON.stringify({table:this.activeTableItem,headers:this.tHeaders,items:this.tItems[id],data:values})
+        },true)
+
+        if(res.status===200){
+          this.tItems[id] =[...values]
+          this.isEdit[id]=!this.isEdit[id]  
+          //dirty trick
+          this.tItems.push(['kostyl'])
+          this.tItems.pop()
+        }
+        else{
+          let response = await res.response
+          console.error(response.sqlMessage)
+          alert(response.sqlMessage)
+        }           
+     },
+     print:function(){
+       console.log("print");
+       this.isPrint = !this.isPrint
+     },
+    },
+
 
 }
 </script>
@@ -196,14 +275,26 @@ export default {
 .label-wrapper
   display: flex
   justify-content: center
-  width: 40%
+  width: 50%
+.label-wrapper-main
+  display: flex
+  justify-content: center
+  width: 90%
+  h2
+    margin-top:70px
+.label-wrapper-modal
+  display: flex
+  justify-content: center
+  width: 99%
 .menu
   width: 10%
   height: 600px
   background-color: $bd-item-border-color
 table
+
   border-collapse: collapse
   width: 90%
+
 .tHeader
   font-size: 1.3em
   font-weight: bold
@@ -240,7 +331,7 @@ hr
 input[type="text"]
   margin: 10px
 .inputs-wrapper
-  width: 40%
+  width: 100%
   display: flex
   flex-direction: column
   justify-content: center
@@ -254,4 +345,43 @@ input[type="text"]
   border-collapse: none
 .tIcon:hover
    background-color: $back-color
+.tInput
+  padding: 0
+  margin: 0
+  border-bottom: 1px solid black
+  background-color: transparent
+  height: 100%
+  margin: 0 !important
+  border-radius:0
+form
+  width: 50%
+.form-wrapper
+  display: flex
+  justify-content: space-between
+  flex-direction: row
+.down-menu
+  background-color: transparent
+  width: 30%
+  margin-left: 40px
+.nav-el
+  margin-top: auto
+  padding-left: 10px
+  padding-right: 10px
+  height: $nav-height - 3px
+  display: flex
+  align-items: center
+  border-bottom: 3px solid transparent
+.nav-el:hover
+  background-color: $back-color
+.btnIcon
+  position: relative
+  top:3px
+  left: 40px  
+.modal
+  position: absolute
+  width: 100%
+  height: 100% 
+  background-color: white
+  opacity: 1
+  z-index: 1000
 </style>

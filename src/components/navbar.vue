@@ -72,6 +72,7 @@ nav
   justify-content: space-between
   background-color:$back-color
   position: fixed
+  z-index: 1000
 .bd-wrapper
   height: $nav-height 
   display: flex
@@ -114,7 +115,7 @@ nav
   margin-top: auto
   padding: 10px
   width: 160px
-  z-index: 111
+  z-index: 2000
 .dropdown-item:hover
   background-color: $back-color
 

@@ -94,6 +94,35 @@ createServer:function(port) {
       
       });      
     });    
+    app.put("/api/editData",jsonParser, function(req, res){
+      console.log(req.body)
+      let table = req.body.table;
+      let whereStr='';
+      let setStr='';
+      for(let i=0;i<req.body.headers.length;i++){
+        whereStr+=`${req.body.headers[i]}="${req.body.items[i]}" `
+        setStr+=`${req.body.headers[i]}="${req.body.data[i]}" `
+        if(i<req.body.headers.length-1){
+          whereStr+='AND '
+          setStr+=', '
+        }
+      }
+
+      console.log(`UPDATE ${table} SET WHERE ${setStr}`);   
+      connection.query(`UPDATE ${table} SET ${setStr} WHERE ${whereStr}`, function(error) {
+        if (error) {
+            console.log(error.message);
+            res.statusCode=500
+            res.send(error)
+        } 
+        else {
+            console.log('success');   
+            res.statusCode=200
+            res.send(['ok'])
+        }
+      
+      });      
+    });        
     app.listen(port, function(){
         console.log("Сервер ожидает подключения...");
         });
