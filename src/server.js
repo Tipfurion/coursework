@@ -1,19 +1,26 @@
 
-    const express = require("express");
-    const bodyParser = require("body-parser");
-    const fs = require("fs");
-    const app = express();
-    const jsonParser = bodyParser.json();
-    const mysql = require("mysql2");
-  
-    const connection = mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      database: "sclad",
-      //database: "sakila",
-      password: "ss32281488"
-    });
-module.exports =  {
+const express = require("express");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const app = express();
+const jsonParser = bodyParser.json();
+const mysql = require("mysql2");
+let dbDefaultSettings = {
+  host: "localhost",
+  user: "root",
+  database: "sclad",
+  password: "ss32281488"
+}
+let connection = mysql.createConnection(dbDefaultSettings);
+function closeConnection(){
+  connection.end(function(err) {
+    if (err) {
+      return console.log("Ошибка: " + err.message);
+    }
+    console.log("Подключение закрыто");
+  });     
+}
+module.exports = {
 createServer:function(port) {
     connection.connect(function(err){
         if (err) {
@@ -23,11 +30,45 @@ createServer:function(port) {
           console.log("Подключение к серверу MySQL успешно установлено");
         }
      });
-    
-    app.use(express.static(__dirname + "/public"));
+
+
+
+    //app.use(express.static(__dirname + "/public"));
+    app.put("/api/changeSettings",jsonParser, function(req, res){
+      let settings = req.body;
+      closeConnection()
+      connection = mysql.createConnection(settings)
+      console.log(settings);
+      
+      connection.connect(function(err){
+        if (err) {
+          return console.error("Ошибка: " + err.message);
+        }
+        else{
+          console.log("Подключение к серверу MySQL успешно установлено");
+        }
+     });
+     connection.on('error', function(err) {
+      console.log("I'm dead");
+      closeConnection()
+      connection = mysql.createConnection(dbDefaultSettings)
+      connection.connect(function(err){
+        if (err) {
+          return console.error("Ошибка: " + err.message);
+        }
+        else{
+          console.log("Подключение к серверу MySQL успешно установлено");
+        }
+     });
+    })
+     res.send(['ok'])
+    });   
+
     app.get("/api/getTables", function(req,res){
       connection.query("SELECT DATABASE()",function(err, results){    
         if(err){
+          console.log('GET_TABLES');
+          
           console.log(err)
         }
         console.log(results)
@@ -38,12 +79,11 @@ createServer:function(port) {
           console.log(err)
         }         
         res.send(results)
+      });
     });
 
-    });
     app.get("/api/getTable/:table", function(req, res){
       let table = req.params.table
-      //connection.query("SELECT * FROM "+"`"+table+"`",
       connection.query("SELECT * FROM "+table,
       function(err, results) {
         if(err){
@@ -126,19 +166,8 @@ createServer:function(port) {
     app.listen(port, function(){
         console.log("Сервер ожидает подключения...");
         });
-    
 },
-  closeConnection:function() {
-        connection.end(function(err) {
-            if (err) {
-              return console.log("Ошибка: " + err.message);
-            }
-            console.log("Подключение закрыто");
-          });        
-  },
-  test:function() {
-    console.log('test')
-  }
+  closeConnection:closeConnection
 }
 
 

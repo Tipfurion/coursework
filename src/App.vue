@@ -69,6 +69,7 @@ export default {
   created:function(){
     this.$on("changeActiveTableItem",this.changeActiveTableItem)
     this.$on("changeActiveFilterItem",this.changeActiveFilterItem)
+    this.$on("getTables",this.getTables)
     this.$on("search",this.search)
 
   },
@@ -93,7 +94,7 @@ body
   font-family: roboto
 #search
   font-family: roboto 
-input[type="text"]
+input[type="text"], input[type="password"]
   appearance: none
   background-color: $bd-item-hover-color
   border: 2px solid transparent
@@ -112,4 +113,19 @@ input[type="text"]
   z-index: 1
 button
   font-family: roboto 
+.submit-button
+  margin-top:10px
+  border: none
+  border-radius: 5px
+  box-shadow: none
+  outline: none !important  
+  height: 40px
+  width: 60%
+  background-color: $bd-item-hover-color
+.submit-button:hover
+  background-color:$back-color
+  transform: scale(1.1)
+.submited
+  background-color:$back-color
+  transform: scale(1.1)
 </style>

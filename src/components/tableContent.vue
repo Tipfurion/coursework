@@ -85,8 +85,8 @@ export default {
     return{
       submited:false,
       arrowActive:false,
-      tHeaders:['ID Поставщика','Телефон','Адрес','Адрес','Адрес','Адрес'],
-      tItems:[['а',1,3,5,6,'a'],['в',1,1,1,1,'c'],['б',2,2,3,4,'b']],
+      tHeaders:['test','test','test','test','test','test'],
+      tItems:[['test','test','test','test','test','test'],['test','test','test','test','test','test'],['test','test','test','test','test','test']],
       isEdit:[],
       tItemsStart: [],
       activeTableItem:"Выберите таблицу",
@@ -226,7 +226,7 @@ export default {
        this.isEdit[id]=!this.isEdit[id]
        this.prevEditIndex = id;
        //dirty trick
-       this.tItems.push(['kostyl'])
+       this.tItems.push([])
        this.tItems.pop()
      },
      submitEdit:async function(id){
@@ -247,7 +247,7 @@ export default {
           this.tItems[id] =[...values]
           this.isEdit[id]=!this.isEdit[id]  
           //dirty trick
-          this.tItems.push(['kostyl'])
+          this.tItems.push([])
           this.tItems.pop()
         }
         else{
@@ -316,18 +316,7 @@ thead
   td
 hr
   margin-top: 10px
-.submit-button
-  margin-top:10px
-  border: none
-  border-radius: 5px
-  box-shadow: none
-  outline: none !important  
-  height: 40px
-  width: 60%
-  background-color: $bd-item-hover-color
-.submit-button:hover
-  background-color:$back-color
-  transform: scale(1.1)
+
 input[type="text"]
   margin: 10px
 .inputs-wrapper
