@@ -9,7 +9,7 @@
 <script>
 import navbar from './components/navbar.vue'
 import tableContent from './components/tableContent.vue'
-import downMenu from './components/downMenu.vue'
+
 
 import reqApi from './sendReq.js'
 export default {
@@ -17,40 +17,51 @@ export default {
   components: {
     navbar,
     tableContent,
-    downMenu
   },
   methods:{
     test:async function(){
       let res = await reqApi.sendReq('api/getTable')
       console.log(res);     
     },
-    changeActiveTableItem:async function(item){
-      
+    changeActiveTableItem:async function(item){     
       this.$refs.navbar.activeFilterItem = '______________________'
       this.$refs.tableContent.activeTableItem = item;
       let res = await reqApi.sendReq('api/getTable/'+item)
+      //смена данных в таблице  
 
-      //смена данных в таблице      
-
-      this.$refs.tableContent.tHeaders = Object.keys(res[0])
-      this.$refs.tableContent.inputValues.length = 0
-      this.$refs.tableContent.inputValues.length = Object.keys(res[0]).length
-      this.$refs.tableContent.tItems.length=0
-      this.$refs.tableContent.isEdit.length = res.length;
-      for(let i=0;i<res.length;i++){
-        this.$refs.tableContent.isEdit[i] = false;
-        this.$refs.tableContent.tItems.push(Object.values(res[i])) 
-      }
-      this.$refs.tableContent.tItemsStart = [...this.$refs.tableContent.tItems]
-      
-      this.$refs.navbar.dbFilterItems = Object.keys(res[0])   
-      this.$refs.tableContent.dbFilterItems = Object.keys(res[0])
-      
-      
+      console.log(res);  
+        
+        this.$refs.tableContent.inputValues.length = 0
+        this.$refs.tableContent.inputValues.length = Object.keys(res[0]).length
+        this.$refs.tableContent.tItems.length=0
+        
+        for(let i=0;i<res.length;i++){
+          this.$refs.tableContent.isEdit[i] = false;
+        }
+      if(Object.keys(res[0])[0]!=="Field"){
+        this.$refs.tableContent.tHeaders = Object.keys(res[0])
+        this.$refs.tableContent.isEdit.length = res.length;
+        for(let i=0;i<res.length;i++){
+          this.$refs.tableContent.tItems.push(Object.values(res[i])) 
+        }
+        this.$refs.tableContent.tItemsStart = [...this.$refs.tableContent.tItems]
+        
+        this.$refs.navbar.dbFilterItems = Object.keys(res[0])   
+        this.$refs.tableContent.dbFilterItems = Object.keys(res[0])
+      } 
+      else{
+        this.$refs.tableContent.tHeaders.length=0
+        for(let i=0;i<res.length;i++)
+        {
+          this.$refs.tableContent.tHeaders.push(res[i].Field)
+        }
+        this.$refs.tableContent.tItems.push(new Array(res.length))
+        
+        
+      }        
     },
     changeActiveFilterItem:function(item){
       this.$refs.tableContent.activeFilterItem = item;
-      //this.$refs.tableContent.tItemsStart = [...this.$refs.tableContent.tItems]
     },
     getTables:async function(){
       let res = await reqApi.sendReq('api/getTables')
@@ -89,6 +100,9 @@ $bd-item-hover-color: #C4C4C4
 body 
   width: 100%
   margin:0
+hr
+  width: 100%
+ 
 #app
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap')
   font-family: roboto
@@ -114,6 +128,9 @@ input[type="text"], input[type="password"]
 button
   font-family: roboto 
 .submit-button
+  display: flex
+  justify-content: center
+  align-items: center
   margin-top:10px
   border: none
   border-radius: 5px
@@ -128,4 +145,5 @@ button
 .submited
   background-color:$back-color
   transform: scale(1.1)
+
 </style>

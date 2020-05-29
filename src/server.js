@@ -30,10 +30,10 @@ createServer:function(port) {
           console.log("Подключение к серверу MySQL успешно установлено");
         }
      });
-
-
-
+    // 
+    //Uncomment next line to use web version
     //app.use(express.static(__dirname + "/public"));
+    //
     app.put("/api/changeSettings",jsonParser, function(req, res){
       let settings = req.body;
       closeConnection()
@@ -88,8 +88,20 @@ createServer:function(port) {
       function(err, results) {
         if(err){
           console.log(err)
-        }       
-        res.send(results)
+        }
+        if(results.length===0){
+          let database = connection.config.database
+          connection.query(`SHOW COLUMNS FROM ${database}.${table}`,(err, results)=>{
+            if(err){
+              console.log(err)
+            }
+            res.send(results)         
+          })
+        }
+        else{
+          res.send(results)
+        }
+        
     });
     
     });

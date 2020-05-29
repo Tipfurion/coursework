@@ -49,9 +49,11 @@
           </tr>
         </tbody>        
       </table>
+      <hr>
       <div class="label-wrapper">
         <h2>Добавить</h2>
       </div>
+      <hr>
       <div class="form-wrapper">
         <form @submit.prevent="submit">
         <div class="inputs-wrapper" >
@@ -60,7 +62,6 @@
           <button class="submit-button" type="submit">Добавить</button>
         </div>
         </form>
-        
         <div class="down-menu">
           <div>
               <button class="submit-button" @click="print">Печать<img class="btnIcon" src="../assets/print.svg"></button>
@@ -85,8 +86,8 @@ export default {
     return{
       submited:false,
       arrowActive:false,
-      tHeaders:['test','test','test','test','test','test'],
-      tItems:[['test','test','test','test','test','test'],['test','test','test','test','test','test'],['test','test','test','test','test','test']],
+      tHeaders:[],
+      tItems:[],
       isEdit:[],
       tItemsStart: [],
       activeTableItem:"Выберите таблицу",
@@ -112,7 +113,8 @@ export default {
             this.clickCounter=0;
           }
        if(this.clickCounter===0){
-         this.tItems =[...this.tItemsStart]
+         this.tItems.length=0;
+         this.tItems = [...this.tItemsStart] 
        }
        else{
         this.tItems.sort((a, b)=> { 
@@ -124,8 +126,8 @@ export default {
             }
           });
        }
-      if(typeof(this.tItems[0][this.activeSortItemIndex]==='string')){
-        this.tItems.reverse()
+      if(typeof(this.tItems[0][this.activeSortItemIndex])==='string' && this.clickCounter!==0){
+        this.tItems = [...this.tItems.reverse()]     
       }
       for(let i=0;i<this.$children.length;i++){
         if(this.$children[i].id === this.activeSortItemIndex){
@@ -225,7 +227,6 @@ export default {
        }
        this.isEdit[id]=!this.isEdit[id]
        this.prevEditIndex = id;
-       //dirty trick
        this.tItems.push([])
        this.tItems.pop()
      },
@@ -246,7 +247,6 @@ export default {
         if(res.status===200){
           this.tItems[id] =[...values]
           this.isEdit[id]=!this.isEdit[id]  
-          //dirty trick
           this.tItems.push([])
           this.tItems.pop()
         }
@@ -257,7 +257,6 @@ export default {
         }           
      },
      print:function(){
-       console.log("print");
        this.isPrint = !this.isPrint
      },
     },
@@ -364,8 +363,7 @@ form
   background-color: $back-color
 .btnIcon
   position: relative
-  top:3px
-  left: 40px  
+  left: 20%  
 .modal
   position: absolute
   width: 100%

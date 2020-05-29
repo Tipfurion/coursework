@@ -28,7 +28,6 @@ export default {
 
   },
   mounted:function(){
-      //this.$el.parentElement.onclick = this.count
       this.id = this.$el.id
   }
 }
