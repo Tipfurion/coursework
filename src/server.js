@@ -5,12 +5,15 @@ const fs = require("fs");
 const app = express();
 const jsonParser = bodyParser.json();
 const mysql = require("mysql2");
-let dbDefaultSettings = {
-  host: "localhost",
-  user: "root",
-  database: "sclad",
-  password: "ss32281488"
-}
+//let dbDefaultSettings = {
+  //host: "localhost",
+  //user: "root",
+  //database: "sclad",
+  //password: "ss32281488"
+//}
+let dbDefaultSettings = require("./dbConfig.js")
+console.log(dbDefaultSettings);
+
 let connection = mysql.createConnection(dbDefaultSettings);
 function closeConnection(){
   connection.end(function(err) {
@@ -25,6 +28,7 @@ createServer:function(port) {
     connection.connect(function(err){
         if (err) {
           return console.error("Ошибка: " + err.message);
+          //throw new error("ERROR_ERROR_ERROR_ERROR")
         }
         else{
           console.log("Подключение к серверу MySQL успешно установлено");
@@ -67,8 +71,7 @@ createServer:function(port) {
     app.get("/api/getTables", function(req,res){
       connection.query("SELECT DATABASE()",function(err, results){    
         if(err){
-          console.log('GET_TABLES');
-          
+          console.log('GET_TABLES');          
           console.log(err)
         }
         console.log(results)

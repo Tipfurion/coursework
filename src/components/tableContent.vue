@@ -331,6 +331,7 @@ input[type="text"]
   border: none
   background-color: white 
   border-collapse: none
+  width: 20px
 .tIcon:hover
    background-color: $back-color
 .tInput

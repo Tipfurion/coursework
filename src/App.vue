@@ -56,7 +56,7 @@ export default {
           this.$refs.tableContent.tHeaders.push(res[i].Field)
         }
         this.$refs.tableContent.tItems.push(new Array(res.length))
-        
+
         
       }        
     },
@@ -64,13 +64,22 @@ export default {
       this.$refs.tableContent.activeFilterItem = item;
     },
     getTables:async function(){
-      let res = await reqApi.sendReq('api/getTables')
+      let res
+      let timeout
+      try{
+        res = await reqApi.sendReq('api/getTables')
+      }
+      catch{
+        this.$refs.tableContent.activeTableItem = "Проверьте подключение к базе данных"
+        res = await reqApi.sendReq('api/getTables')     
+      }
       this.$refs.navbar.dbItems.length=0;
       for(let i=0;i<res.length;i++)
       {
           let objValue = Object.values(res[i]); 
           this.$refs.navbar.dbItems.push(objValue[0]) 
       }
+
     },
 
     search:function(value){
