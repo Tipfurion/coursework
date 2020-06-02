@@ -15,4 +15,4 @@ npm run serve
 npm run build
 ```
 
-![Preview](https://raw.githubusercontent.com/Tipfurion/couresework/master/readmeImg/main.jpg)
+![Preview](https://raw.githubusercontent.com/Tipfurion/coursework/master/readmeImg/Preview.PNG)
