@@ -5,12 +5,6 @@ const fs = require("fs");
 const app = express();
 const jsonParser = bodyParser.json();
 const mysql = require("mysql2");
-//let dbDefaultSettings = {
-  //host: "localhost",
-  //user: "root",
-  //database: "sclad",
-  //password: "ss32281488"
-//}
 let dbDefaultSettings = require("./dbConfig.js")
 console.log(dbDefaultSettings);
 
